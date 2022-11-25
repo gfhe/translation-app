@@ -1,0 +1,19 @@
+# torch https://download.pytorch.org/whl/torch_stable.html
+torch==1.12.0+cu102 
+# torchvision==0.12.0+cu102 
+# torchaudio==0.12.0
+
+dl_translate 
+nltk 
+Flask 
+emoji 
+ltp 
+
+#env
+protobuf==3.20.* 
+
+# deploy 
+gunicorn 
+greenlet 
+eventlet 
+gevent
