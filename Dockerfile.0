@@ -1,0 +1,5 @@
+FROM python:3.9
+COPY src/requirements.txt /requirements.txt
+RUN pip install -r /requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
+COPY init.py /init.py
+RUN python /init.py && rm /init.py

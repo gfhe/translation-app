@@ -1,6 +1,6 @@
-FROM python:3.9
+FROM hgfkeep/translation:base
 COPY src /app
-RUN pip install -r /app/requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
-COPY init.py /init.py
-RUN python /init.py && rm /init.py
+RUN mkdir /app/logs
 WORKDIR /app
+EXPOSE 7000
+RUN gunicorn -c gunicorn_config.py translation:apps
