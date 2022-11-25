@@ -96,7 +96,7 @@ def process_format(doc: str):
     return sent_list, sent_mask
 
 
-def translate(article, source_lang, target_lang):
+def do_translate(article, source_lang, target_lang):
     try:
         sentence_ids = []
         split_sentence_list = []
@@ -121,8 +121,6 @@ def translate(article, source_lang, target_lang):
                     split_sentence = sent_tokenize(
                         item_split_text, lang=source_lang)
                     '''单条数据太长导致翻译速度缓慢'''
-                    # sentence_ids.extend([(index,i) for i in range(len(split_sentence))])
-                    # split_sentence_list.extend(split_sentence)
                     tmp_sent = ''
                     tmp_ids = 0
                     for sent_index, sent in enumerate(split_sentence):
@@ -166,12 +164,6 @@ def translate(article, source_lang, target_lang):
                     batch_sentence, source=source_lang, target=target_lang, batch_size=32)
             result.extend(res)
             torch.cuda.empty_cache()
-        # sentence_ids = [{'index':index,'split_index':_[0],'sent_index':_[1]} for index,_ in enumerate(sentence_ids)]
-        # sentence_ids.sort(key=itemgetter('split_index'))
-        # res_list = []
-        # for sent_index, data in groupby(sentence_ids, key=itemgetter('split_index')):
-        #     res_list.append(''.join(result[x['index']] for x in data))
-            # res_list.append({"index": sent_index, "value": ''.join(result[x['index']] for x in data)})
         output = []
         for index, mask in enumerate(doc_mask):
             if mask == 0:
@@ -228,9 +220,9 @@ def translate():
     source_lang = p['src']
     target_lang = p['dest']
 
-    translate(article, source_lang, target_lang)
+    return do_translate(article, source_lang, target_lang)
 
 
 if __name__ == '__main__':
-    print(translate('i love china', 'English', 'Chinese').response)
+    print(do_translate('i love china', 'English', 'Chinese').response)
     apps.run(host='0.0.0.0', port='7000', debug=False, threaded=True)
