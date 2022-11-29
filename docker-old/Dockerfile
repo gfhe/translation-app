@@ -1,7 +1,4 @@
 FROM hgfkeep/translation:base
-LABEL maintainer="HGF"
-LABEL repository="hgfkeep"
-
 COPY src /app
 RUN mkdir /app/logs
 WORKDIR /app

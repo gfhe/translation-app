@@ -1,0 +1,9 @@
+FROM hgfkeep/translation:torch-1.9.0-cu102
+LABEL maintainer="HGF"
+LABEL repository="hgfkeep"
+
+ENV TRANSFORMERS_CACHE=/root
+COPY src/requirements.txt /requirements.txt
+RUN pip install -r /requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
+COPY init.py /init.py
+RUN python3 /init.py && rm /init.py
