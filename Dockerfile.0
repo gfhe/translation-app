@@ -1,5 +1,6 @@
-FROM python:3.9
+FROM huggingface/transformers-pytorch-gpu:4
+ENV TRANSFORMERS_CACHE=/root
 COPY src/requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
 COPY init.py /init.py
-RUN python /init.py && rm /init.py
+RUN python3 /init.py && rm /init.py

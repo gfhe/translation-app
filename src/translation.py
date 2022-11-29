@@ -12,8 +12,23 @@ import dl_translate as dlt
 import torch
 import json
 import os
+
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 warnings.filterwarnings('ignore')
+
+offline = os.getenv('TRANSFORMERS_OFFLINE', 0)
+cache_dir = os.getenv('HUGGINGFACE_HUB_CACHE', '/root/.cache/huggingface/hub')
+
+tlp_model_or_path = 'LTP/small'
+m2m100_model_or_path = 'facebook/m2m100_418M'
+# mbart50_model_or_path = 'facebook/mbart-large-50-many-to-many-mmt'
+if offline == 1:
+    tlp_model_or_path = cache_dir+'/LTP__small'
+    m2m100_model_or_path = cache_dir+'/facebook__m2m100_418M'
+    # mbart50_model_or_path = cache_dir+'/facebook__mbart-large-50-many-to-many-mmt'
+else:
+    print("use online models, make sure network online")
+    # mbart50_model_or_path = 'facebook/mbart-large-50-many-to-many-mmt'
 
 # 获取device 信息
 DEVICE = 'cpu'
@@ -23,13 +38,13 @@ print(f"choose device: {DEVICE}")
 
 apps = Flask(__name__)
 
-ltp = LTP(pretrained_model_name_or_path='LTP/small')
+ltp = LTP(pretrained_model_name_or_path=tlp_model_or_path)
 
 mt_m2m100 = dlt.TranslationModel(
-    model_or_path='facebook/m2m100_418M', model_family='m2m100', device=DEVICE)
+    model_or_path=m2m100_model_or_path, model_family='m2m100', device=DEVICE)
 """2021/05/20新增mbart50模型"""
-mt_mbart50 = dlt.TranslationModel(
-    model_or_path='facebook/mbart-large-50-many-to-many-mmt', model_family='mbart50', device=DEVICE)
+# mt_mbart50 = dlt.TranslationModel(
+#     model_or_path=mbart50_model_or_path, model_family='mbart50', device=DEVICE)
 lang_code_map_m2m100 = dlt.utils.get_lang_code_map('m2m100')
 lang_code_map_mbart50 = dlt.utils.get_lang_code_map('mbart50')
 MAX_LENGTH = 200
@@ -73,7 +88,6 @@ def get_batch_data(data=None, batch_size=None, shuffle=False):
 
 
 def sent_tokenize(article: str, lang: str = None):
-
     if lang == None or lang == 'Chinese' or lang == 'Japanese':
         return ltp.sent_split([article])
     else:
@@ -139,7 +153,7 @@ def do_translate(article, source_lang, target_lang):
                             split_sentence_list.append(sent)
                             tmp_ids += 1
                         # 当前句子加临时句子长度小于最大长度
-                        elif len(tmp_sent)+len(sent) < MAX_LENGTH:
+                        elif len(tmp_sent) + len(sent) < MAX_LENGTH:
                             tmp_sent += sent
                         # 当前句子加临时句子长度大于最大长度
                         else:
@@ -156,12 +170,12 @@ def do_translate(article, source_lang, target_lang):
         assert source_lang in lang_code_map_m2m100 and target_lang in lang_code_map_m2m100
         result = []
         for batch_sentence in gen_batch_data(data=split_sentence_list, batch_size=32):
-            if source_lang == 'English':
-                res = mt_mbart50.translate(
-                    batch_sentence, source=source_lang, target=target_lang, batch_size=32)
-            else:
-                res = mt_m2m100.translate(
-                    batch_sentence, source=source_lang, target=target_lang, batch_size=32)
+            # if source_lang == 'English':
+            #     res = mt_mbart50.translate(
+            #         batch_sentence, source=source_lang, target=target_lang, batch_size=32)
+            # else:
+            res = mt_m2m100.translate(
+                batch_sentence, source=source_lang, target=target_lang, batch_size=32)
             result.extend(res)
             torch.cuda.empty_cache()
         output = []
