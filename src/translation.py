@@ -16,19 +16,17 @@ import os
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 warnings.filterwarnings('ignore')
 
-offline = os.getenv('TRANSFORMERS_OFFLINE', 0)
-cache_dir = os.getenv('HUGGINGFACE_HUB_CACHE', '/root/.cache/huggingface/hub')
+offline = os.getenv('TRANSFORMERS_OFFLINE', '0')
 
 tlp_model_or_path = 'LTP/small'
 m2m100_model_or_path = 'facebook/m2m100_418M'
 # mbart50_model_or_path = 'facebook/mbart-large-50-many-to-many-mmt'
-if offline == 1:
-    tlp_model_or_path = cache_dir+'/LTP__small'
-    m2m100_model_or_path = cache_dir+'/facebook__m2m100_418M'
-    # mbart50_model_or_path = cache_dir+'/facebook__mbart-large-50-many-to-many-mmt'
-else:
-    print("use online models, make sure network online")
-    # mbart50_model_or_path = 'facebook/mbart-large-50-many-to-many-mmt'
+# if offline == '1':
+#     tlp_model_or_path = '/root/models--LTP--small'
+#     m2m100_model_or_path = '/root/models--facebook--m2m100_418M'
+    # mbart50_model_or_path = '/root/facebook__mbart-large-50-many-to-many-mmt'
+# else:
+#     print("use online models, make sure network online")
 
 # 获取device 信息
 DEVICE = 'cpu'
